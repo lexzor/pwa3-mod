@@ -3,15 +3,25 @@
 
 HMODULE g_hOriginal = nullptr;
 
-void CreateDebugConsole();
-
+void CreateDebugConsole() {
+    AllocConsole();
+    FILE* fp;
+    freopen_s(&fp, "CONOUT$", "w", stdout);
+    freopen_s(&fp, "CONOUT$", "w", stderr);
+    freopen_s(&fp, "CONIN$", "r", stdin);
+    std::cout.clear();
+    std::clog.clear();
+    std::cerr.clear();
+    std::cin.clear();
+    printf("Created debug console\n");
+}
 DWORD WINAPI InitThread(LPVOID)
 {
-    g_hOriginal = LoadLibraryA("GameLogic_orig.dll");
+    g_hOriginal = LoadLibraryA("gamelogic.original.dll");
 
     if (!g_hOriginal)
     {
-        MessageBoxA(nullptr, "Failed to load GameLogic_orig.dll\n", "Error", MB_ICONERROR);
+        MessageBoxA(nullptr, "Failed to load gamelogic.original.dll\n", "Error", MB_ICONERROR);
         return 0;
     }
 
@@ -27,17 +37,4 @@ BOOL WINAPI DllMain(HINSTANCE hinst, DWORD reason, LPVOID)
         CreateThread(nullptr, 0, InitThread, nullptr, 0, nullptr);
     }
     return TRUE;
-}
-
-void CreateDebugConsole() {
-    AllocConsole();
-    FILE* fp;
-    freopen_s(&fp, "CONOUT$", "w", stdout);
-    freopen_s(&fp, "CONOUT$", "w", stderr);
-    freopen_s(&fp, "CONIN$", "r", stdin);
-    std::cout.clear();
-    std::clog.clear();
-    std::cerr.clear();
-    std::cin.clear();
-    printf("Created debug console\n");
 }
