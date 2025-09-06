@@ -1,0 +1,1 @@
+In order to ignore changes made in `CMakeLists.txt` in project directory, run `git update-index --no-skip-worktree CMakeLists.txt`.
