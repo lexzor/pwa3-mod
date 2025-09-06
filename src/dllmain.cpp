@@ -3,7 +3,8 @@
 
 HMODULE g_hOriginal = nullptr;
 
-void CreateDebugConsole() {
+void CreateDebugConsole()
+{
     AllocConsole();
     FILE* fp;
     freopen_s(&fp, "CONOUT$", "w", stdout);
@@ -15,6 +16,7 @@ void CreateDebugConsole() {
     std::cin.clear();
     printf("Created debug console\n");
 }
+
 DWORD WINAPI InitThread(LPVOID)
 {
     g_hOriginal = LoadLibraryA("gamelogic.original.dll");
