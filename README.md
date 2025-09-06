@@ -1,6 +1,6 @@
 ## Pwn Adventure 3: Pwnie Island Modding
 
-This project provides a framework for modding the original game. Currently, only the **Windows version** is supported.
+This project is intended to provides a framework for modding the original game. It has been created in educational purpose to improve reverse engineering and C++ skills. Currently, only the **Windows version** is supported.
 
 ---
 
