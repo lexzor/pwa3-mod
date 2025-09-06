@@ -26,6 +26,6 @@ git update-index --skip-worktree CMakeLists.txt
 
 ## Development
 
-For easier development, you can set the `GAME_PATH` in `CMakeLists.txt` (line 23) to point to your game executable.
+For easier development, you can set the `GAME_PATH` in `CMakeLists.txt` to point to your game executable.
 
 This allows the DLL to be automatically copied into the game directory after building.
