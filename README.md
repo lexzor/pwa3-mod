@@ -1,5 +1,30 @@
+## Pwn Adventure 3: Pwnie Island Modding
 
-# Configuration
+This project provides a framework for modding the original game. Currently, only the **Windows version** is supported.
 
-`CmakeLists.txt` in this repository it's only a template. You need to make modifications in it before pushing changes
-In order to ignore changes made in `CMakeLists.txt`, run `git update-index --no-skip-worktree CMakeLists.txt` command.
+---
+
+## How to Use
+
+We modify the original `GameLogic.dll`. To make your custom DLL work, you need to:
+
+1. Rename the original `GameLogic.dll` to `GameLogic.original.dll`.
+2. Replace it with your built DLL from this project.
+
+---
+
+## Configuration
+
+The `CMakeLists.txt` in this repository serves as a **template**. You may need to modify it before committing or creating pull requests.
+
+To prevent Git from tracking your local changes to `CMakeLists.txt`, run:
+
+```bash
+git update-index --skip-worktree CMakeLists.txt
+```
+
+## Development
+
+For easier development, you can set the GAME_PATH in CMakeLists.txt (line 23) to point to your game executable.
+
+This allows the DLL to be automatically copied into the game directory after building.
