@@ -25,7 +25,7 @@ target_link_libraries(PwnAdventure3Mod PRIVATE
 )
 
 # NOTE: Set your PwnAdventure3.exe absolute path in order to move the file into the game directory.
-set(GAME_EXE "D:/Programming/PwnAdventure3/PwnAdventure3/Binaries/Win32/PwnAdventure3-Win32-Shipping.exe")
+set(GAME_EXE "GAME_PATH")
 
 add_custom_command(TARGET PwnAdventure3Mod POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
