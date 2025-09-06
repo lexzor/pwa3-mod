@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.8)
 
 project(PwnAdventure3Mod)
 
@@ -6,8 +6,14 @@ file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.h")
 
 add_library(PwnAdventure3Mod SHARED ${SOURCES})
 
+set_target_properties(PwnAdventure3Mod PROPERTIES OUTPUT_NAME "GameLogic")
+
 if (CMAKE_VERSION VERSION_GREATER 3.12)
     set_property(TARGET PwnAdventure3Mod PROPERTY CXX_STANDARD 23)
+endif()
+
+if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+    target_compile_definitions(PwnAdventure3Mod PRIVATE COMPILE_X86_ONLY)
 endif()
 
 target_include_directories(PwnAdventure3Mod PRIVATE
@@ -19,10 +25,10 @@ target_link_libraries(PwnAdventure3Mod PRIVATE
 )
 
 # NOTE: Set your PwnAdventure3.exe absolute path in order to move the file into the game directory.
-set(GAME_EXE "GAME_PATH")
+set(GAME_EXE "D:/Programming/PwnAdventure3/PwnAdventure3/Binaries/Win32/PwnAdventure3-Win32-Shipping.exe")
 
 add_custom_command(TARGET PwnAdventure3Mod POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         $<TARGET_FILE:PwnAdventure3Mod>
-        "${GAME_EXE}/../$<TARGET_FILE_NAME:PwnAdventure3Mod>"
+        "${GAME_EXE}/../GameLogic.dll"
 )
