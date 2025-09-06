@@ -3,7 +3,7 @@
 
 HMODULE g_hOriginal = nullptr;
 
-void CreateDebugConsole()
+static void CreateDebugConsole()
 {
     AllocConsole();
     FILE* fp;
@@ -17,22 +17,16 @@ void CreateDebugConsole()
     printf("Created debug console\n");
 }
 
-DWORD WINAPI InitThread(LPVOID)
+static DWORD WINAPI InitThread(LPVOID)
 {
-    g_hOriginal = LoadLibraryA("gamelogic.original.dll");
-
-    if (!g_hOriginal)
-    {
-        MessageBoxA(nullptr, "Failed to load gamelogic.original.dll\n", "Error", MB_ICONERROR);
-        return 0;
-    }
+    g_hOriginal = LoadLibraryA("gamelogic_original.dll");
 
     CreateDebugConsole();
 
     return 0;
 }
 
-BOOL WINAPI DllMain(HINSTANCE hinst, DWORD reason, LPVOID) 
+static BOOL WINAPI DllMain(HINSTANCE hinst, DWORD reason, LPVOID)
 {
     if (reason == DLL_PROCESS_ATTACH) {
         DisableThreadLibraryCalls(hinst);
