@@ -3,56 +3,8 @@
 #include "sdk/GameLogic.h"
 #include "memory.h"
 #include "MinHook.h"
-#include "game.h"
-
-using SetGameAPIObjectType = void(__cdecl*)(GameAPI*);
-SetGameAPIObjectType oSetGameAPIObject = nullptr;
-
-void __cdecl hSetGameAPIObject(GameAPI* game_api)
-{
-    if (oSetGameAPIObject)
-        oSetGameAPIObject(game_api);
-}
-
-using GameAPIShutdownType = void(__cdecl*)(GameAPI*);
-SetGameAPIObjectType oGameAPIShutDown = nullptr;
-
-void __cdecl hGameAPIShutdown(GameAPI* game_api)
-{
-    DLLMemory::get()->Uninitialize();
-
-    if (oGameAPIShutDown)
-        oGameAPIShutDown(game_api);
-}
-
-static void CreateDebugConsole()
-{
-    AllocConsole();
-    FILE* fp;
-
-    freopen_s(&fp, "CONOUT$", "w", stdout);
-    freopen_s(&fp, "CONOUT$", "w", stderr);
-    freopen_s(&fp, "CONIN$", "r", stdin);
-    
-    std::cout.clear();
-    std::clog.clear();
-    std::cerr.clear();
-    std::cin.clear();
-
-    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    if (hOut != INVALID_HANDLE_VALUE)
-    {
-        DWORD dwMode = 0;
-        if (GetConsoleMode(hOut, &dwMode))
-        {
-            dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-            SetConsoleMode(hOut, dwMode);
-        }
-
-        Logger::Info("!gDebug console has been created succesfully");
-    }
-    else printf("Failed to get console handle");
-}
+#include "dllmain.h"
+#include "detours.h"
 
 static DWORD WINAPI InitThread(LPVOID)
 {
@@ -82,6 +34,7 @@ static DWORD WINAPI InitThread(LPVOID)
         return -1;
     }
 
+    // Register some detours
     DLLMemory::get()->RegisterDetour(0x10020C90, &hSetGameAPIObject, &oSetGameAPIObject);
     DLLMemory::get()->RegisterDetour(0x1001D9D0, &hGameAPIShutdown, &oGameAPIShutDown);
 
