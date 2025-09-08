@@ -2,8 +2,7 @@
 #include <iostream>
 #include "sdk/GameLogic.h"
 #include "utils/logger.h"
-
-HMODULE g_hOriginal = nullptr;
+#include "memory.h"
 
 static void CreateDebugConsole()
 {
@@ -16,7 +15,6 @@ static void CreateDebugConsole()
     std::clog.clear();
     std::cerr.clear();
     std::cin.clear();
-    printf("Created debug console\n");
 
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
     if (hOut != INVALID_HANDLE_VALUE)
@@ -27,27 +25,28 @@ static void CreateDebugConsole()
             dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
             SetConsoleMode(hOut, dwMode);
         }
+
+        Logger::Info("!gDebug console has been created succesfully");
     }
+    else printf("Failed to get console handle");
 }
 
 static DWORD WINAPI InitThread(LPVOID)
 {
-    g_hOriginal = LoadLibraryA("gamelogic_original.dll");
-
-    if (g_hOriginal == NULL)
-    {
-        MessageBoxA(NULL, "Failed to find gamelogic_original.dll", "Error", MB_OKCANCEL | MB_ICONERROR);
-        return 0;
-    }
-
-    CreateDebugConsole();
-
     Logger::SetOptions({
         .ColorPrefix = "!",
         .InfoPrefix = "",
         .WarningPrefix = "!y[WARNING]!d ",
         .ErrorPrefix = "!r[ERROR]!d ",
     });
+
+    CreateDebugConsole();
+
+    if (!DLLMemory::get()->LoadOriginalDLL("gamelogic_riginal.dll"))
+    {
+        Logger::Error("Failed to load gamelogic_original.dll. The game mods won't work. Please visit!p https://github.com/lexzor/pwa3-mod!d and follow installation steps.");
+        return 0;
+    }
 
     return 0;
 }
