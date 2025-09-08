@@ -1,8 +1,29 @@
 ﻿#include <windows.h>
 #include <iostream>
 #include "sdk/GameLogic.h"
-#include "utils/logger.h"
 #include "memory.h"
+#include "MinHook.h"
+#include "game.h"
+
+using SetGameAPIObjectType = void(__cdecl*)(GameAPI*);
+SetGameAPIObjectType oSetGameAPIObject = nullptr;
+
+void __cdecl hSetGameAPIObject(GameAPI* game_api)
+{
+    if (oSetGameAPIObject)
+        oSetGameAPIObject(game_api);
+}
+
+using GameAPIShutdownType = void(__cdecl*)(GameAPI*);
+SetGameAPIObjectType oGameAPIShutDown = nullptr;
+
+void __cdecl hGameAPIShutdown(GameAPI* game_api)
+{
+    DLLMemory::get()->Uninitialize();
+
+    if (oGameAPIShutDown)
+        oGameAPIShutDown(game_api);
+}
 
 static void CreateDebugConsole()
 {
@@ -35,6 +56,7 @@ static void CreateDebugConsole()
 
 static DWORD WINAPI InitThread(LPVOID)
 {
+    // Configure logger
     Logger::SetOptions({
         .ColorPrefix = "!",
         .InfoPrefix = "",
@@ -42,13 +64,26 @@ static DWORD WINAPI InitThread(LPVOID)
         .ErrorPrefix = "!r[ERROR]!d ",
     });
 
+    // Create console for debugging
     CreateDebugConsole();
 
-    if (!DLLMemory::get()->LoadOriginalDLL("gamelogic_riginal.dll"))
+    // Load original dll
+    if (!DLLMemory::get()->LoadOriginalDLL("gamelogic_original.dll"))
     {
         Logger::Error("Failed to load gamelogic_original.dll. The game mods won't work. Please visit!p https://github.com/lexzor/pwa3-mod!d and follow installation steps.");
         return 0;
     }
+
+    // Initialize 
+    MH_STATUS status = MH_ERROR_DISABLED;
+    if (!DLLMemory::get()->InitializeMinHook(status))
+    {
+        Logger::Error("Failed to initialize MinHook. Status: {}", MH_StatusToString(status));
+        return -1;
+    }
+
+    DLLMemory::get()->RegisterDetour(0x10020C90, &hSetGameAPIObject, &oSetGameAPIObject);
+    DLLMemory::get()->RegisterDetour(0x1001D9D0, &hGameAPIShutdown, &oGameAPIShutDown);
 
     return 0;
 }
