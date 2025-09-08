@@ -1,6 +1,7 @@
 ﻿#include <windows.h>
 #include <iostream>
 #include "sdk/GameLogic.h"
+#include "utils/logger.h"
 
 HMODULE g_hOriginal = nullptr;
 
@@ -16,6 +17,17 @@ static void CreateDebugConsole()
     std::cerr.clear();
     std::cin.clear();
     printf("Created debug console\n");
+
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (hOut != INVALID_HANDLE_VALUE)
+    {
+        DWORD dwMode = 0;
+        if (GetConsoleMode(hOut, &dwMode))
+        {
+            dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+            SetConsoleMode(hOut, dwMode);
+        }
+    }
 }
 
 static DWORD WINAPI InitThread(LPVOID)
@@ -30,11 +42,12 @@ static DWORD WINAPI InitThread(LPVOID)
 
     CreateDebugConsole();
 
-    uintptr_t dllBase = (uintptr_t)g_hOriginal;
-
-    uintptr_t worldAddr = dllBase + 0x97D7C;
-    ClientWorld* world = nullptr;
-    world = *(ClientWorld**)worldAddr;
+    Logger::SetOptions({
+        .ColorPrefix = "!",
+        .InfoPrefix = "",
+        .WarningPrefix = "!y[WARNING]!d ",
+        .ErrorPrefix = "!r[ERROR]!d ",
+    });
 
     return 0;
 }
