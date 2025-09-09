@@ -5,6 +5,28 @@
 #include "MinHook.h"
 #include "dllmain.h"
 #include "detours.h"
+#include "commands_registry.h"
+#include "events_manager.h"
+
+class TestClass
+{
+public:
+    TestClass()
+    {
+        CommandsRegistry::get()->RegisterCommand("/test", CMD_BIND(this, OnCommand));
+        EventsManager::get()->RegisterEventCallback<OnGameStartEventData>(EventType::OnGameStart, EV_BIND(this, OnGameStart));
+    }
+
+    void OnCommand()
+    {
+        Logger::Info("TestClass::OnCommand");
+    }
+
+    void OnGameStart(OnGameStartEventData* data)
+    {
+        Logger::Info("TestClass::OnGameStart");
+    }
+};
 
 static DWORD WINAPI InitThread(LPVOID)
 {
@@ -37,6 +59,12 @@ static DWORD WINAPI InitThread(LPVOID)
     // Register some detours
     DLLMemory::get()->RegisterDetour(0x10020C90, &hSetGameAPIObject, &oSetGameAPIObject);
     DLLMemory::get()->RegisterDetour(0x1001D9D0, &hGameAPIShutdown, &oGameAPIShutDown);
+
+    CommandsRegistry::get()->Initialize();
+
+    TestClass test{};
+
+    EventsManager::get()->TriggerEvent<OnGameStartEventData>(EventType::OnGameStart, { .deltaTime = 100.0f });
 
     return 0;
 }

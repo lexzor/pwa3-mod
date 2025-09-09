@@ -34,7 +34,7 @@ const HMODULE& DLLMemory::GetModule() const
 	return m_ModuleHandle;
 }
 
-bool DLLMemory::RegisterDetour(const uintptr_t va_address, const void* detour, const void* original)
+bool DLLMemory::RegisterDetour(uintptr_t va_address, void* detour, void* original)
 {
 	uintptr_t rva = RVA(va_address);
 
@@ -42,7 +42,7 @@ bool DLLMemory::RegisterDetour(const uintptr_t va_address, const void* detour, c
 
 	if (status != MH_OK)
 	{
-		Logger::Error("Failed to detour SetGameAPIObject function. Status: %s", MH_StatusToString(status));
+		Logger::Error("Failed to detour function with address {:p} . Status: {}", va_address, MH_StatusToString(status));
 		return false;
 	}
 
@@ -50,7 +50,7 @@ bool DLLMemory::RegisterDetour(const uintptr_t va_address, const void* detour, c
 
 	if (status != MH_OK)
 	{
-		Logger::Error("Failed to enable hook for SetGameAPIObject function. Status: %s", MH_StatusToString(status));
+		Logger::Error("Failed to register hook for {:p} function. Status: {}", va_address, MH_StatusToString(status));
 		return true;
 	}
 
