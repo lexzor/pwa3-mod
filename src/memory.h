@@ -23,8 +23,7 @@ public:
 	bool InitializeMinHook(MH_STATUS& status);
 	bool LoadOriginalDLL(const char* path);
 	const HMODULE& GetModule() const;
-	bool RegisterDetour(uintptr_t address, void* detour, void* original);
-	bool RegisterDetour(const DetourData& data);
+	bool RegisterDetour(uintptr_t address, void* detour, void** original);
 
 	template<typename T = uintptr_t>
 	T RVA(uintptr_t va_address)

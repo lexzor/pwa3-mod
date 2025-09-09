@@ -16,14 +16,10 @@ class CommandsRegistry : public Singleton<CommandsRegistry>
 public:
 		
 private:
-	using PlayerChatTypeHook = void(__fastcall*)(Player* _this, void* /*ignored*/, const char* text);
-	PlayerChatTypeHook oPlayerChatHook;
-
 	std::unordered_map<std::string, std::vector<OnPlayerChatCallback>> m_Registry;
 
 public:
 	void Initialize();
 	void RegisterCommand(const char* cmd, OnPlayerChatCallback callback);
-	void OnCommand(Player* player, const char* cmd);
-	static void __fastcall hPlayerChat(Player* player, void*, const char* text);
+	bool OnCommand(Player* player, const char* cmd);
 };

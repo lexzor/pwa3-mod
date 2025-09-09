@@ -1,10 +1,16 @@
 #include "detours.h"
+#include "commands_registry.h"
+#include "memory.h"
+#include "events_manager.h"
 
-std::vector<DetourData> g_Detours =
+const std::vector<DetourData> g_Detours =
 {
-    DetourData("SetGameAPIObject",  0x10020C90, &hSetGameAPIObject,     &oSetGameAPIObject),
-    DetourData("GameAPIShutdown",   0x1001D9D0, &hGameAPIShutdown,      &oGameAPIShutDown),
+    { "SetGameAPIObject",   0x10020C90, (void*)&hSetGameAPIObject,      (void**)&oSetGameAPIObject  },
+    { "GameAPIShutdown",    0x1001D9D0, (void*)&hGameAPIShutdown,       (void**)&oGameAPIShutDown   },
+    { "Player::Chat",       0x100551A0, (void*)&hPlayerChat,            (void**)&oPlayerChat        },
 };
+
+// GameAPI(GameAPI*)
 
 GameAPIGenericType oSetGameAPIObject   = nullptr;
 GameAPIGenericType oGameAPIShutDown    = nullptr;
@@ -24,4 +30,16 @@ void __cdecl hGameAPIShutdown(GameAPI* game_api)
 
     EventsManager::get()->TriggerEvent<OnGameStateEventData>(EventType::OnGameShutdown, { .game_api = game_api });
     DLLMemory::get()->Uninitialize();
+}
+
+// Player::Chat(Player*, const char*)
+PlayerChatType oPlayerChat = nullptr;
+
+void __fastcall hPlayerChat(Player* player, void* /*ignored*/, const char* text)
+{
+    if (!CommandsRegistry::get()->OnCommand(player, text))
+    {
+        if (oPlayerChat)
+            oPlayerChat(player, nullptr, text);
+    }
 }

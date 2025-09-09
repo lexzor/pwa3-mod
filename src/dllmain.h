@@ -42,13 +42,15 @@ static void RegisterDetours()
 
     for (const DetourData& dt_data : g_Detours)
     {
-        if (!DLLMemory::get()->RegisterDetour(dt_data))
+        //Logger::Info("{:p} {:p} {:p}", (void*)dt_data.va_address, (void*)dt_data.hook_function, (void*)dt_data.original_function);
+
+        if (!DLLMemory::get()->RegisterDetour(dt_data.va_address, dt_data.hook_function, dt_data.original_function))
         {
-            Logger::Error("Failed to register detour at address {:p} for function {}", dt_data.va_address, dt_data.name);
+            Logger::Error("Failed to register detour at address {:p} for function {}", dt_data.va_address, dt_data.detour_name);
         }
         else
         {
-            Logger::Info("!g[DETOURS]!d Registered detour for function!y {}!d.", dt_data.name);
+            Logger::Info("!g[DETOURS]!d Registered detour for function!y {}!d.", dt_data.detour_name);
         }
     }
 }
