@@ -19,8 +19,8 @@ struct DetourData
 
 extern const std::vector<DetourData> g_Detours;
 
-// GameAPI(GameAPI*)
-using GameAPIGenericType = void(__cdecl*)(GameAPI*);
+// GameAPI
+using GameAPIGenericType = void(__cdecl*)(GameAPI* game_api);
 
 extern GameAPIGenericType oSetGameAPIObject;	// SetGameAPIObject (called when game starts and when game shutdown having GameAPI param as a nullptr)
 extern GameAPIGenericType oGameAPIShutDown;		// GameAPI::Shutdown (called on game shutdown)
@@ -29,8 +29,13 @@ void __cdecl hSetGameAPIObject	(GameAPI* game_api);
 void __cdecl hGameAPIShutdown	(GameAPI* game_api);
 
 // Player::Chat(Player*, const char*)
-
 using PlayerChatType = void(__fastcall*)(Player* _this, void* /*ignored*/, const char* text);
 extern PlayerChatType oPlayerChat;
 
 void __fastcall hPlayerChat(Player* player, void*, const char* text);
+
+// World::AddLocalPlayer
+using WorldAddLocalPlayerType = void(__thiscall*)(World* _this, Player* player, ILocalPlayer* local_player);
+extern WorldAddLocalPlayerType oWorldAddLocalPlayer;
+
+void __fastcall hWorldAddLocalPlayer(World* _this, void*, Player* player, ILocalPlayer* local_player);

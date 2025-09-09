@@ -5,9 +5,10 @@
 
 const std::vector<DetourData> g_Detours =
 {
-    { "SetGameAPIObject",   0x10020C90, (void*)&hSetGameAPIObject,      (void**)&oSetGameAPIObject  },
-    { "GameAPIShutdown",    0x1001D9D0, (void*)&hGameAPIShutdown,       (void**)&oGameAPIShutDown   },
-    { "Player::Chat",       0x100551A0, (void*)&hPlayerChat,            (void**)&oPlayerChat        },
+    { "SetGameAPIObject",           0x10020C90, (void*)&hSetGameAPIObject,      (void**)&oSetGameAPIObject      },
+    { "GameAPIShutdown",            0x1001D9D0, (void*)&hGameAPIShutdown,       (void**)&oGameAPIShutDown       },
+    { "Player::Chat",               0x100551A0, (void*)&hPlayerChat,            (void**)&oPlayerChat            },
+    { "World::AddLocalPlayer",      0x10062C70, (void*)&hWorldAddLocalPlayer,   (void**)&oWorldAddLocalPlayer   }
 };
 
 // GameAPI(GameAPI*)
@@ -42,4 +43,13 @@ void __fastcall hPlayerChat(Player* player, void* /*ignored*/, const char* text)
         if (oPlayerChat)
             oPlayerChat(player, nullptr, text);
     }
+}
+
+// World::AddLocalPlayer
+WorldAddLocalPlayerType oWorldAddLocalPlayer = nullptr;
+
+void __fastcall hWorldAddLocalPlayer(World* _this, void*, Player* player, ILocalPlayer* local_player)
+{
+    if (oWorldAddLocalPlayer)
+        oWorldAddLocalPlayer(_this, player, local_player);
 }
