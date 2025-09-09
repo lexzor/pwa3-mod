@@ -8,6 +8,8 @@
 #include "utils/logger.h"
 #include "utils/singleton.h"
 
+struct DetourData;
+
 constexpr uintptr_t IDA_IMAGE_BASE = 0x10000000;
 
 class DLLMemory : public Singleton<DLLMemory>
@@ -22,6 +24,7 @@ public:
 	bool LoadOriginalDLL(const char* path);
 	const HMODULE& GetModule() const;
 	bool RegisterDetour(uintptr_t address, void* detour, void* original);
+	bool RegisterDetour(const DetourData& data);
 
 	template<typename T = uintptr_t>
 	T RVA(uintptr_t va_address)

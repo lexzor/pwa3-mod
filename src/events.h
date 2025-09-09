@@ -5,9 +5,10 @@
 enum class EventType
 {
 	OnGameStart,
+	OnGameShutdown
 };
 
-struct OnGameStartEventData
+struct OnGameStateEventData
 {
 	GameAPI* game_api;
 };

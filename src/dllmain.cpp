@@ -15,7 +15,8 @@ public:
     TestClass()
     {
         CommandsRegistry::get()->RegisterCommand("/test", CMD_BIND(this, OnCommand));
-        EventsManager::get()->RegisterEventCallback<OnGameStartEventData>(EventType::OnGameStart, EV_BIND(this, OnGameStart));
+        EventsManager::get()->RegisterEventCallback<OnGameStateEventData>(EventType::OnGameStart, EV_BIND(this, OnGameStart));
+        EventsManager::get()->RegisterEventCallback<OnGameStateEventData>(EventType::OnGameShutdown, EV_BIND(this, OnGameShutdown));
     }
 
     void OnCommand()
@@ -23,9 +24,14 @@ public:
         Logger::Info("TestClass::OnCommand");
     }
 
-    void OnGameStart(OnGameStartEventData* data)
+    void OnGameStart(OnGameStateEventData* data)
     {
         Logger::Info("TestClass::OnGameStart");
+    }
+
+    void OnGameShutdown(OnGameStateEventData* data)
+    {
+        Logger::Info("TestClass::OnGameShutdown");
     }
 };
 
@@ -57,11 +63,7 @@ static DWORD WINAPI InitThread(LPVOID)
         return -1;
     }
 
-    // Register some detours
-    DLLMemory::get()->RegisterDetour(0x10020C90, &hSetGameAPIObject, &oSetGameAPIObject);
-    DLLMemory::get()->RegisterDetour(0x1001D9D0, &hGameAPIShutdown, &oGameAPIShutDown);
-
-    CommandsRegistry::get()->Initialize();
+    RegisterDetours();
 
     TestClass test{};
 

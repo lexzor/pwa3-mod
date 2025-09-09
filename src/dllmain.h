@@ -4,6 +4,8 @@
 #include <iostream>
 #include <cstdio>
 #include "utils/logger.h"
+#include "memory.h"
+#include "detours.h"
 
 static void CreateDebugConsole()
 {
@@ -32,4 +34,21 @@ static void CreateDebugConsole()
     }
 
     Logger::Info("!gSuccesfully created debug console");
+}
+
+static void RegisterDetours()
+{
+    Logger::Info("Registering detours...");
+
+    for (const DetourData& dt_data : g_Detours)
+    {
+        if (!DLLMemory::get()->RegisterDetour(dt_data))
+        {
+            Logger::Error("Failed to register detour at address {:p} for function {}", dt_data.va_address, dt_data.name);
+        }
+        else
+        {
+            Logger::Info("!g[DETOURS]!d Registered detour for function!y {}!d.", dt_data.name);
+        }
+    }
 }
