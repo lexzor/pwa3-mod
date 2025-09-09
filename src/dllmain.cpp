@@ -7,6 +7,7 @@
 #include "detours.h"
 #include "commands_registry.h"
 #include "events_manager.h"
+#include "events.h"
 
 class TestClass
 {
@@ -63,8 +64,6 @@ static DWORD WINAPI InitThread(LPVOID)
     CommandsRegistry::get()->Initialize();
 
     TestClass test{};
-
-    EventsManager::get()->TriggerEvent<OnGameStartEventData>(EventType::OnGameStart, { .deltaTime = 100.0f });
 
     return 0;
 }

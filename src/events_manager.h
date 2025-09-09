@@ -1,27 +1,16 @@
 #pragma once
 
 #include <functional>
-
-#include "utils/singleton.h"
-#include "sdk/GameLogic.h"
 #include <unordered_map>
 #include <vector>
+
+#include "utils/singleton.h"
+#include "events.h"
 
 #define EV_BIND(obj, func) [obj](auto* data){ (obj)->func(data); }
 
 template<typename EventData>
 using EventCallback = std::function<void(EventData*)>;
-
-enum class EventType
-{
-	OnGameStart,
-	OnJoinOnServer,
-};
-
-struct OnGameStartEventData
-{
-	float deltaTime;
-};
 
 class EventsManager : public Singleton<EventsManager>
 {
