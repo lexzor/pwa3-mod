@@ -63,7 +63,11 @@ struct Vector3 {
     float y;
     float z;
 public:
-    Vector3();
+    Vector3()
+    {
+
+    }
+
     Vector3(float, float, float);
     Vector3 operator*(float) const;
     Vector3& operator*=(float);

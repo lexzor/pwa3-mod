@@ -38,13 +38,9 @@ static void CreateDebugConsole()
 
 static void RegisterDetours()
 {
-    Logger::Info("Registering detours...");
-
     for (const DetourData& dt_data : g_Detours)
     {
-        //Logger::Info("{:p} {:p} {:p}", (void*)dt_data.va_address, (void*)dt_data.hook_function, (void*)dt_data.original_function);
-
-        if (!DLLMemory::get()->RegisterDetour(dt_data.va_address, dt_data.hook_function, dt_data.original_function))
+        if (!DLLMemory::get()->RegisterDetour(dt_data.va_address, dt_data.hook_function, dt_data.original_function, true))
         {
             Logger::Error("Failed to register detour at address {:p} for function {}", dt_data.va_address, dt_data.detour_name);
         }

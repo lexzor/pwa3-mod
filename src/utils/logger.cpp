@@ -34,3 +34,31 @@ void Logger::SetOptions(const Logger::Options& options)
     AddColor(m_Options.WarningPrefix);
     AddColor(m_Options.ErrorPrefix);
 }
+
+void Logger::AddColor(std::string& text)
+{
+    size_t pos = 0;
+
+    while ((pos = text.find(m_Options.ColorPrefix, pos)) != std::string::npos)
+    {
+        if (pos + 1 >= text.size()) break;
+
+        std::string key(1, text[pos + 1]);
+        auto colorIndex = std::find(TextColorsKeys.begin(), TextColorsKeys.end(), key);
+
+        if (colorIndex != TextColorsKeys.end())
+        {
+            size_t colorCodeIndex = std::distance(TextColorsKeys.begin(), colorIndex);
+            const std::string& ansiCode = TextColors[colorCodeIndex];
+
+            text.replace(pos, 2, ansiCode);
+            pos += ansiCode.size();
+        }
+        else
+        {
+            ++pos;
+        }
+    }
+
+    text.append(TextColors[(size_t)TextColor::Default]);
+}

@@ -16,11 +16,13 @@ class EventsManager : public Singleton<EventsManager>
 {
 public:
 
-	template<typename EventData = void>
+	template<typename EventData>
 	void RegisterEventCallback(EventType event, EventCallback<EventData> callback)
 	{
 		m_EventsCallbacks[event].push_back(
-			[callback](void* data) { callback(static_cast<EventData*>(data)); }
+			[callback](void* data) {
+				callback(static_cast<EventData*>(data));
+			}
 		);
 	}
 

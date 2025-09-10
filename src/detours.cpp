@@ -18,18 +18,19 @@ GameAPIGenericType oGameAPIShutDown    = nullptr;
 
 void __cdecl hSetGameAPIObject(GameAPI* game_api)
 {
+    EventsManager::get()->TriggerEvent<OnGameStateEventData>(EventType::OnGameStart, { .game_api = game_api });
+    
     if (oSetGameAPIObject)
         oSetGameAPIObject(game_api);
-
-    EventsManager::get()->TriggerEvent<OnGameStateEventData>(EventType::OnGameStart, { .game_api = game_api });
 }
 
 void __cdecl hGameAPIShutdown(GameAPI* game_api)
 {
+    EventsManager::get()->TriggerEvent<OnGameStateEventData>(EventType::OnGameShutdown, { .game_api = game_api });
+    
     if (oGameAPIShutDown)
         oGameAPIShutDown(game_api);
 
-    EventsManager::get()->TriggerEvent<OnGameStateEventData>(EventType::OnGameShutdown, { .game_api = game_api });
     DLLMemory::get()->Uninitialize();
 }
 
@@ -50,6 +51,32 @@ WorldAddLocalPlayerType oWorldAddLocalPlayer = nullptr;
 
 void __fastcall hWorldAddLocalPlayer(World* _this, void*, Player* player, ILocalPlayer* local_player)
 {
+    EventsManager::get()->TriggerEvent<OnAddLocalPlayerEventData>(EventType::OnAddLocalPlayer, {
+        .world = _this,
+        .player = player,
+        .local_player = local_player
+    });
+
+    void** vtable = *(void***)_this;
+    void* worldTickFn = vtable[1];  // World::Tick in vtable
+
+    DLLMemory::get()->RegisterDetour((uintptr_t)worldTickFn, (void*)&hWorldTick, (void**)&oWorldTick, false);
+
     if (oWorldAddLocalPlayer)
         oWorldAddLocalPlayer(_this, player, local_player);
+}
+
+// World::Tick
+using WorldTickType = void(__thiscall*)(World* _this, float deltaTime);
+WorldTickType oWorldTick = nullptr;
+
+void __fastcall hWorldTick(World* _this, void* /*ignored*/, float deltaTime)
+{
+    EventsManager::get()->TriggerEvent<OnWorldTickEventData>(EventType::OnWorldTick, {
+        .world = _this,
+        .delta_time = deltaTime
+    });
+
+    if (oWorldTick)
+        oWorldTick(_this, deltaTime);
 }

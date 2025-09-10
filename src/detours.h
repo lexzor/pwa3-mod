@@ -39,3 +39,9 @@ using WorldAddLocalPlayerType = void(__thiscall*)(World* _this, Player* player, 
 extern WorldAddLocalPlayerType oWorldAddLocalPlayer;
 
 void __fastcall hWorldAddLocalPlayer(World* _this, void*, Player* player, ILocalPlayer* local_player);
+
+// World::Tick
+using WorldTickType = void(__thiscall*)(World* _this, float deltaTime);
+extern WorldTickType oWorldTick;
+
+void __fastcall hWorldTick(World* _this, void* /*ignored*/, float deltaTime);

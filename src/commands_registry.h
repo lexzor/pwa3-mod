@@ -13,13 +13,10 @@ using OnPlayerChatCallback = std::function<void()>;
 
 class CommandsRegistry : public Singleton<CommandsRegistry>
 {
-public:
-		
 private:
 	std::unordered_map<std::string, std::vector<OnPlayerChatCallback>> m_Registry;
 
 public:
-	void Initialize();
 	void RegisterCommand(const char* cmd, OnPlayerChatCallback callback);
 	bool OnCommand(Player* player, const char* cmd);
 };

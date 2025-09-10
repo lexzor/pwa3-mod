@@ -11,12 +11,42 @@
 
 class TestClass
 {
+private:
+    ClientWorld* m_ClientWorld = nullptr;
+
 public:
     TestClass()
     {
         CommandsRegistry::get()->RegisterCommand("/test", CMD_BIND(this, OnCommand));
         EventsManager::get()->RegisterEventCallback<OnGameStateEventData>(EventType::OnGameStart, EV_BIND(this, OnGameStart));
         EventsManager::get()->RegisterEventCallback<OnGameStateEventData>(EventType::OnGameShutdown, EV_BIND(this, OnGameShutdown));
+        EventsManager::get()->RegisterEventCallback<OnAddLocalPlayerEventData>(EventType::OnAddLocalPlayer, EV_BIND(this, OnAddLocalPlayer));
+        EventsManager::get()->RegisterEventCallback<OnWorldTickEventData>(EventType::OnWorldTick, EV_BIND(this, OnWorldTick));
+    }
+
+    void OnWorldTick(OnWorldTickEventData* data)
+    {
+        Logger::Info("World::Tick; deltaTime = {}", data->delta_time);
+
+        static bool displayedMessage;
+
+        if (!m_ClientWorld && !displayedMessage)
+        {
+            Logger::Error("m_ClientWorld does not exists!");
+            displayedMessage = true;
+            return;
+        }
+
+        IPlayer* iplayer = m_ClientWorld->m_activePlayer.m_object;
+        Player* player = ((Player*)(iplayer));
+        player->m_walkingSpeed = 99999.0f;
+    }
+
+    void OnAddLocalPlayer(OnAddLocalPlayerEventData* data)
+    {
+        Logger::Info("TestClass::OnAddLocalPlayer");
+
+        m_ClientWorld = DLLMemory::get()->RVA<ClientWorld*>(0x10097D7C);
     }
 
     void OnCommand()

@@ -3,7 +3,9 @@
 #include <Windows.h>
 #include <vector>
 #include <string>
+#include <type_traits>
 #include <MinHook.h>
+
 
 #include "utils/logger.h"
 #include "utils/singleton.h"
@@ -21,12 +23,14 @@ public:
 public:
 	void Uninitialize();
 	bool InitializeMinHook(MH_STATUS& status);
+
 	bool LoadOriginalDLL(const char* path);
 	const HMODULE& GetModule() const;
-	bool RegisterDetour(uintptr_t address, void* detour, void** original);
+	
+	bool RegisterDetour(uintptr_t address, void* detour, void** original, const bool is_rva_address);
 
 	template<typename T = uintptr_t>
-	T RVA(uintptr_t va_address)
+	T RVA(uintptr_t va_address) const
 	{
 		uintptr_t RVA = (uintptr_t)m_ModuleHandle - IDA_IMAGE_BASE + va_address;
 

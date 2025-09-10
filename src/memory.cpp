@@ -35,25 +35,26 @@ const HMODULE& DLLMemory::GetModule() const
 	return m_ModuleHandle;
 }
 
-bool DLLMemory::RegisterDetour(uintptr_t va_address, void* detour, void** original)
+bool DLLMemory::RegisterDetour(uintptr_t address, void* detour, void** original, const bool is_rva_address)
 {
-    uintptr_t rva = RVA(va_address);
+	if(is_rva_address)
+		address = RVA(address);
     
-	MH_STATUS status = MH_CreateHook((LPVOID)rva, (LPVOID)detour, (LPVOID*)original);
+	MH_STATUS status = MH_CreateHook((LPVOID)address, (LPVOID)detour, (LPVOID*)original);
     if (status != MH_OK)
     {
-        Logger::Error("Failed to detour function with address {:p}. Status: {}", (void*)va_address, MH_StatusToString(status));
+        Logger::Error("Failed to detour function with address {:p}. Status: {}", (void*)address, MH_StatusToString(status));
         return false;
     }
 
-    status = MH_EnableHook((LPVOID)rva);
+    status = MH_EnableHook((LPVOID)address);
     if (status != MH_OK)
     {
-        Logger::Error("Failed to enable hook for {:p}. Status: {}", (void*)va_address, MH_StatusToString(status));
+        Logger::Error("Failed to enable hook for {:p}. Status: {}", (void*)address, MH_StatusToString(status));
         return false;
     }
 
-    m_HookRegistry.push_back(va_address);
+    m_HookRegistry.push_back(address);
 
     return true;
 }
